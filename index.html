@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Beetle Care" />
+  <link rel="apple-touch-icon" href="./icon-512.png" />
+  <link rel="icon" type="image/png" href="./icon-512.png" />
+  <title>Beetle Care Tracker</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Noto+Sans+HK:wght@400;500;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Baloo 2"', '"Noto Sans HK"', "ui-rounded", "system-ui", "sans-serif"],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body { font-family: "Baloo 2", "Noto Sans HK", ui-rounded, system-ui, sans-serif; }
+  </style>
+</head>
+<body class="bg-lime-50">
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel" src="./src/storage.jsx"></script>
+  <script type="text/babel" src="./src/theme.jsx"></script>
+  <script type="text/babel" src="./src/i18n.jsx"></script>
+  <script type="text/babel" src="./src/PhotoPicker.jsx"></script>
+  <script type="text/babel" src="./src/BeetleSetupForm.jsx"></script>
+  <script type="text/babel" src="./src/ShareExport.jsx"></script>
+  <script type="text/babel" src="./src/BeetleProfileCard.jsx"></script>
+  <script type="text/babel" src="./src/BeetleSwitcher.jsx"></script>
+  <script type="text/babel" src="./src/ReminderDashboard.jsx"></script>
+  <script type="text/babel" src="./src/DiaryLog.jsx"></script>
+  <script type="text/babel" src="./src/GrowthLog.jsx"></script>
+  <script type="text/babel" src="./src/TempHumidityLog.jsx"></script>
+  <script type="text/babel" src="./src/exploreData.jsx"></script>
+  <script type="text/babel" src="./src/Explore.jsx"></script>
+  <script type="text/babel" src="./src/BeetleQuiz.jsx"></script>
+  <script type="text/babel" src="./src/BackupSettings.jsx"></script>
+  <script type="text/babel" src="./src/TodayOverview.jsx"></script>
+  <script type="text/babel" src="./src/Root.jsx"></script>
+  <script type="text/babel" src="./src/main.jsx"></script>
+</body>
+</html>
