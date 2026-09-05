@@ -90,17 +90,32 @@ window.App = window.App || {};
   }
 
   function ReminderDashboard({ beetle, onMarkDone, onFrequencyChange }) {
+    const { t } = useI18n();
+    // A reminder with no frequency (currently only substrate during pupa)
+    // isn't shown as a mission at all — there's nothing to be "due".
+    const visibleTypes = Storage.REMINDER_TYPES.filter((type) => beetle.reminders[type.key].frequencyDays != null);
+    const pausedTypes = Storage.REMINDER_TYPES.filter((type) => beetle.reminders[type.key].frequencyDays == null);
+
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {Storage.REMINDER_TYPES.map((type) => (
-          <ReminderCard
-            key={type.key}
-            type={type}
-            reminder={beetle.reminders[type.key]}
-            onMarkDone={() => onMarkDone(type.key)}
-            onFrequencyChange={(days) => onFrequencyChange(type.key, days)}
-          />
-        ))}
+      <div>
+        {pausedTypes.length > 0 && (
+          <Card className="mb-4 bg-amber-50 border-amber-200">
+            <p className="text-sm font-bold text-amber-700">
+              {pausedTypes.map((type) => type.emoji).join(" ")} {t("dashboard.pausedForPupa")}
+            </p>
+          </Card>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {visibleTypes.map((type) => (
+            <ReminderCard
+              key={type.key}
+              type={type}
+              reminder={beetle.reminders[type.key]}
+              onMarkDone={() => onMarkDone(type.key)}
+              onFrequencyChange={(days) => onFrequencyChange(type.key, days)}
+            />
+          ))}
+        </div>
       </div>
     );
   }

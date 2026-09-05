@@ -21,6 +21,23 @@ window.App = window.App || {};
     { key: "adult", emoji: "🪲" },
   ];
 
+  // Substrate change frequency depends on life stage, unlike the other three
+  // reminders. Rainbow Stag Beetle (and Lucanidae generally) larvae live and
+  // feed inside the substrate itself — digging them up to "clean" it damages
+  // their feeding galleries — and a pupating beetle must not be disturbed at
+  // all, since breaking its pupal cell can kill it or cause deformed
+  // eclosion. Verified against species care guides rather than assumed:
+  // invertebratesupplies.co.uk's care sheet says to check "smaller larvae
+  // every four to six weeks and larger larvae every six to eight weeks" (not
+  // a fixed clean-out schedule — 60 rounds that upper range), and both that
+  // page and richardsinverts.com's care sheet say to stop substrate changes
+  // entirely once a pupal cell is built. `null` means no reminder is shown.
+  const SUBSTRATE_FREQUENCY_BY_STAGE = {
+    larva: 60,
+    pupa: null,
+    adult: 30,
+  };
+
   // Feature 6: streak & points system. Badge label comes from i18n
   // (t("careBadge." + key)) — this only holds the point thresholds.
   const BADGE_TIERS = [
@@ -87,6 +104,26 @@ window.App = window.App || {};
     return { ...state, beetles: state.beetles.map(recomputeStreak) };
   }
 
+  // One-time migration for beetles saved before substrate frequency became
+  // stage-dependent: every beetle used to get frequencyDays=30 regardless of
+  // life stage. Only touches larva/pupa beetles whose substrate frequency is
+  // still exactly that old universal default (30) — a real customization
+  // happening to also equal exactly 30 is unlikely enough that this is a
+  // safe heuristic, and it avoids re-stomping deliberate edits on every load
+  // the way re-running this unconditionally would.
+  function reconcileSubstrateForStage(state) {
+    return {
+      ...state,
+      beetles: state.beetles.map((b) => {
+        const stageDefault = SUBSTRATE_FREQUENCY_BY_STAGE[b.lifeStage];
+        const looksUnmigrated =
+          (b.lifeStage === "larva" || b.lifeStage === "pupa") && b.reminders.substrate.frequencyDays === 30;
+        if (!looksUnmigrated) return b;
+        return { ...b, reminders: { ...b.reminders, substrate: { ...b.reminders.substrate, frequencyDays: stageDefault } } };
+      }),
+    };
+  }
+
   function uid() {
     if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
@@ -102,11 +139,12 @@ window.App = window.App || {};
   // fields: { name, species, lifeStage, eclosionDate, photoDataUrl, jellyDate, substrateDate, waterDate, woodDate }
   // all date fields are raw <input type="date"> strings (or blank/undefined)
   function createBeetle(fields) {
+    const lifeStage = fields.lifeStage || "larva";
     return {
       id: uid(),
       name: fields.name.trim(),
       species: (fields.species || "").trim(),
-      lifeStage: fields.lifeStage || "larva",
+      lifeStage,
       eclosionDate: fields.eclosionDate ? dateInputToISO(fields.eclosionDate) : null,
       photoDataUrl: fields.photoDataUrl || null,
       supplyNotes: (fields.supplyNotes || "").trim(),
@@ -117,7 +155,7 @@ window.App = window.App || {};
       gamification: defaultGamification(),
       reminders: {
         jelly: { frequencyDays: REMINDER_TYPES[0].defaultDays, lastDoneAt: dateInputToISO(fields.jellyDate) },
-        substrate: { frequencyDays: REMINDER_TYPES[1].defaultDays, lastDoneAt: dateInputToISO(fields.substrateDate) },
+        substrate: { frequencyDays: SUBSTRATE_FREQUENCY_BY_STAGE[lifeStage], lastDoneAt: dateInputToISO(fields.substrateDate) },
         water: { frequencyDays: REMINDER_TYPES[2].defaultDays, lastDoneAt: dateInputToISO(fields.waterDate) },
         wood: { frequencyDays: REMINDER_TYPES[3].defaultDays, lastDoneAt: dateInputToISO(fields.woodDate) },
       },
@@ -127,17 +165,22 @@ window.App = window.App || {};
   // Applies an edited BeetleSetupForm submission to an existing beetle,
   // preserving id/createdAt/frequencyDays. Used by the profile edit flow.
   function updateBeetleFields(beetle, fields) {
+    const lifeStage = fields.lifeStage || "larva";
     return {
       ...beetle,
       name: fields.name.trim(),
       species: (fields.species || "").trim(),
-      lifeStage: fields.lifeStage || "larva",
+      lifeStage,
       eclosionDate: fields.eclosionDate ? dateInputToISO(fields.eclosionDate) : null,
       photoDataUrl: fields.photoDataUrl || null,
       supplyNotes: (fields.supplyNotes || "").trim(),
       reminders: {
         jelly: { ...beetle.reminders.jelly, lastDoneAt: dateInputToISO(fields.jellyDate) },
-        substrate: { ...beetle.reminders.substrate, lastDoneAt: dateInputToISO(fields.substrateDate) },
+        substrate: {
+          ...beetle.reminders.substrate,
+          frequencyDays: SUBSTRATE_FREQUENCY_BY_STAGE[lifeStage],
+          lastDoneAt: dateInputToISO(fields.substrateDate),
+        },
         water: { ...beetle.reminders.water, lastDoneAt: dateInputToISO(fields.waterDate) },
         wood: { ...beetle.reminders.wood, lastDoneAt: dateInputToISO(fields.woodDate) },
       },
@@ -222,7 +265,10 @@ window.App = window.App || {};
   }
 
   // Whole-day difference between "now" and the due date, ignoring time-of-day.
+  // Returns null when the reminder has no frequency set (e.g. substrate
+  // during pupa) — there's nothing to be "due".
   function daysUntilDue(reminder) {
+    if (reminder.frequencyDays == null) return null;
     const last = new Date(reminder.lastDoneAt);
     const due = new Date(last.getTime() + reminder.frequencyDays * MS_PER_DAY);
     const now = new Date();
@@ -235,6 +281,7 @@ window.App = window.App || {};
     STORAGE_KEY,
     REMINDER_TYPES,
     LIFE_STAGES,
+    SUBSTRATE_FREQUENCY_BY_STAGE,
     BADGE_TIERS,
     POINTS,
     uid,
@@ -252,5 +299,6 @@ window.App = window.App || {};
     recomputeStreak,
     addPoints,
     reconcileStreaks,
+    reconcileSubstrateForStage,
   };
 })();

@@ -68,6 +68,7 @@ window.App = window.App || {};
       "dashboard.daysUnit": "days",
       "dashboard.save": "Save",
       "dashboard.markDone": "✅ Mark Done",
+      "dashboard.pausedForPupa": "Substrate reminder is paused during the pupa stage — don't disturb it!",
 
       "diary.addEntry": "+ Add Diary Entry",
       "diary.whatHappened": "What happened today?",
@@ -129,6 +130,8 @@ window.App = window.App || {};
       "climate.humidityChartTitle": "💧 Humidity",
       "climate.latest": "Latest",
       "climate.needOneValue": "Enter a temperature or humidity value.",
+      "climate.referenceRangeNote": "🌡️💧 Reference for the Rainbow Stag Beetle: 22–26°C and 70–85% humidity. (Different species may need different ranges — this app doesn't have a species database, so treat this as a Rainbow Stag Beetle-specific guide.)",
+      "climate.idealRange": "Ideal range: {lo}–{hi}{unit}",
 
       "profile.share": "📤 Share",
       "share.modalTitle": "Share {name}",
@@ -215,6 +218,7 @@ window.App = window.App || {};
       "dashboard.daysUnit": "日",
       "dashboard.save": "儲存",
       "dashboard.markDone": "✅ 完成咗",
+      "dashboard.pausedForPupa": "蛹期暫停木屑提醒 —— 千祈唔好搞佢！",
 
       "diary.addEntry": "+ 新增日記",
       "diary.whatHappened": "今日發生咩事？",
@@ -275,6 +279,8 @@ window.App = window.App || {};
       "climate.humidityChartTitle": "💧 濕度",
       "climate.latest": "最新",
       "climate.needOneValue": "請輸入溫度或者濕度數值。",
+      "climate.referenceRangeNote": "🌡️💧 彩虹鍬形蟲參考範圍：溫度 22–26°C,濕度 70–85%。（唔同品種可能需要唔同範圍——呢個 App 冇物種資料庫,呢組數值淨係彩虹鍬形蟲適用。）",
+      "climate.idealRange": "理想範圍：{lo}–{hi}{unit}",
 
       "profile.share": "📤 分享",
       "share.modalTitle": "分享{name}",

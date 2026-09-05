@@ -10,6 +10,22 @@ playful icons, chunky rounded buttons, badge/achievement graphics.
 - Deployed as static site, added to iPad home screen (behaves like a standalone app)
 - Mobile-first layout (primary device is iPad, portrait orientation)
 
+### Deployment
+- **Live at https://charleschow2045.github.io/beetle-care-app/** — GitHub
+  Pages, served from the `main` branch root, same pattern as the sibling
+  `english-ops`/`chinese-ops` projects (each its own repo under the
+  `charleschow2045` GitHub account, each with Pages enabled via
+  `gh api repos/<name>/pages -X POST -f "source[branch]=main" -f "source[path]=/"`).
+  This repo (`beetle-care-app/`) has its **own** git history, separate from
+  the parent `Claude` folder's `sketch-echo` repo — `git` commands here
+  only see this folder.
+  This is now the primary way to use the app (works from any device,
+  including the iPad, with no local server running) — the local
+  `StaticServer.exe` setup below is for **development/testing only**.
+  To publish a change: commit + `git push` from `beetle-care-app/`; Pages
+  rebuilds automatically (takes ~30-60s — poll
+  `gh api repos/charleschow2045/beetle-care-app/pages` for `"status":"built"`).
+
 ### Implementation detail: no build step
 - No Node.js required: React, ReactDOM, Babel Standalone, and Tailwind are
   loaded via `<script>` CDN tags (same pattern as the sibling `sketch-echo`
@@ -59,6 +75,19 @@ playful icons, chunky rounded buttons, badge/achievement graphics.
    four reminder types per beetle (jelly, substrate, misting, wood), each with
    editable frequency in days, dashboard cards showing days until due / overdue,
    "mark done" button resets the countdown.
+   - **Substrate is the one reminder whose frequency depends on life stage**,
+     not a flat number (`Storage.SUBSTRATE_FREQUENCY_BY_STAGE` in
+     `storage.jsx`): larva 60 days, pupa **no reminder at all** (hidden from
+     the Missions dashboard, with a note explaining why), adult 30 days.
+     Verified against species care guides rather than assumed — see the
+     comment above `SUBSTRATE_FREQUENCY_BY_STAGE` for sources and reasoning.
+     Applied at beetle creation, at profile edit (life stage picker), and
+     when a Feature 4 growth/molt event changes life stage. A one-time
+     migration (`Storage.reconcileSubstrateForStage`, run at app load)
+     upgrades beetles saved before this existed, but only touches
+     larva/pupa beetles whose substrate frequency is still exactly the old
+     universal default (30) — a real customization happening to equal
+     exactly 30 is unlikely, so this won't clobber a deliberate edit.
 2. **Photo log / diary** — photo + short note + date, shown as scrollable timeline.
 3. **Temperature & humidity log** — manual entry, simple line chart over time.
    Chart is hand-rolled SVG (`src/TempHumidityLog.jsx`, `MiniLineChart`) —
@@ -68,6 +97,17 @@ playful icons, chunky rounded buttons, badge/achievement graphics.
    confusing for a child reading it. Either value can be logged without the
    other. Worth +5 points per reading (diary-entry-sized, since it's a quick
    log) and counts as a care action for the Feature 6 streak.
+   - **Reference range for the Rainbow Stag Beetle** (`REFERENCE_RANGE` in
+     `TempHumidityLog.jsx`): 22–26°C, 70–85% humidity. Verified against
+     species care guides, not assumed — see sources in the comment above
+     `REFERENCE_RANGE`. Explicitly labeled as Rainbow-Stag-Beetle-specific
+     in both the info note and the i18n string text, since `species` is
+     free text and a future beetle of a different species would need a
+     different range this app has no way to know. Shown as: a text note at
+     the top of the tab, an "Ideal range" line under each chart, and a
+     shaded green band drawn behind each chart's line (the chart's Y domain
+     expands to include the reference band even when actual readings fall
+     outside it, so the band is always visible for comparison).
 4. **Molting / eclosion event log** — separate from daily care; tag entries as
    larva / pupa / adult stage milestones. Updates the beetle's life stage.
    Each stage shows a one-line care tip (Woofz/Dogo-style pairing of

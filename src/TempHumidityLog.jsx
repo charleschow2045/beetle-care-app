@@ -8,6 +8,13 @@ window.App = window.App || {};
   const { Button, Card } = window.App.UI;
   const { useI18n } = window.App.I18n;
 
+  // Reference range for the Rainbow Stag Beetle (Phalacrognathus muelleri)
+  // specifically — not a general beetle range, since `species` is free text
+  // and could be something else. Verified against species care guides
+  // (invertebratesupplies.co.uk, beetlesbug.com both independently cite
+  // 22-26°C, humidity above 70% with 70-85% commonly given as ideal).
+  const REFERENCE_RANGE = { temperature: [22, 26], humidity: [70, 85] };
+
   function todayInputValue() {
     const d = new Date();
     const pad = (n) => String(n).padStart(2, "0");
@@ -18,25 +25,38 @@ window.App = window.App || {};
     return new Date(iso).toLocaleDateString(lang === "zh" ? "zh-HK" : "en-US", { month: "short", day: "numeric" });
   }
 
-  function MiniLineChart({ points, color }) {
+  function MiniLineChart({ points, color, referenceRange }) {
     const w = 300;
     const h = 100;
     const pad = 10;
     if (points.length === 0) return null;
 
     const values = points.map((p) => p.value);
-    const lo = Math.min(...values);
-    const hi = Math.max(...values);
+    // Domain includes the reference band too, so it's always visible even
+    // if every actual reading falls outside it.
+    const lo = Math.min(...values, ...(referenceRange || []));
+    const hi = Math.max(...values, ...(referenceRange || []));
     const range = hi - lo || 1;
+
+    const yFor = (v) => h - pad - ((v - lo) / range) * (h - pad * 2);
 
     const coords = points.map((p, i) => {
       const x = points.length === 1 ? w / 2 : pad + (i / (points.length - 1)) * (w - pad * 2);
-      const y = h - pad - ((p.value - lo) / range) * (h - pad * 2);
-      return { x, y };
+      return { x, y: yFor(p.value) };
     });
 
     return (
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-24">
+        {referenceRange && (
+          <rect
+            x={0}
+            y={yFor(referenceRange[1])}
+            width={w}
+            height={yFor(referenceRange[0]) - yFor(referenceRange[1])}
+            fill="#22c55e"
+            opacity="0.12"
+          />
+        )}
         <polyline
           points={coords.map((c) => `${c.x},${c.y}`).join(" ")}
           fill="none"
@@ -52,7 +72,7 @@ window.App = window.App || {};
     );
   }
 
-  function ChartCard({ title, points, color, unit }) {
+  function ChartCard({ title, points, color, unit, referenceRange }) {
     const { t } = useI18n();
     if (points.length === 0) return null;
     const latest = points[points.length - 1].value;
@@ -64,7 +84,10 @@ window.App = window.App || {};
             {t("climate.latest")}: <span className="font-extrabold text-stone-700">{latest}{unit}</span>
           </span>
         </div>
-        <MiniLineChart points={points} color={color} />
+        <MiniLineChart points={points} color={color} referenceRange={referenceRange} />
+        <p className="text-[11px] font-bold text-emerald-600 mt-1">
+          {t("climate.idealRange", { lo: referenceRange[0], hi: referenceRange[1], unit })}
+        </p>
       </Card>
     );
   }
@@ -181,6 +204,10 @@ window.App = window.App || {};
 
     return (
       <div>
+        <Card className="mb-4 bg-amber-50 border-amber-200">
+          <p className="text-sm font-bold text-stone-700">{t("climate.referenceRangeNote")}</p>
+        </Card>
+
         {adding ? (
           <TempReadingForm onSave={handleSave} onCancel={() => setAdding(false)} />
         ) : (
@@ -189,8 +216,20 @@ window.App = window.App || {};
           </Button>
         )}
 
-        <ChartCard title={t("climate.tempChartTitle")} points={tempPoints} color="#f59e0b" unit="°C" />
-        <ChartCard title={t("climate.humidityChartTitle")} points={humidityPoints} color="#0ea5e9" unit="%" />
+        <ChartCard
+          title={t("climate.tempChartTitle")}
+          points={tempPoints}
+          color="#f59e0b"
+          unit="°C"
+          referenceRange={REFERENCE_RANGE.temperature}
+        />
+        <ChartCard
+          title={t("climate.humidityChartTitle")}
+          points={humidityPoints}
+          color="#0ea5e9"
+          unit="%"
+          referenceRange={REFERENCE_RANGE.humidity}
+        />
 
         {readings.length === 0 ? (
           <Card className="text-center">

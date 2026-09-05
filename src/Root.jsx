@@ -45,7 +45,9 @@ window.App = window.App || {};
 
   function Root() {
     const { t } = useI18n();
-    const [state, setState] = useState(() => Storage.reconcileStreaks(Storage.loadState()));
+    const [state, setState] = useState(() =>
+      Storage.reconcileStreaks(Storage.reconcileSubstrateForStage(Storage.loadState()))
+    );
     const [editingProfile, setEditingProfile] = useState(false);
     const [activeTab, setActiveTab] = useState("missions");
 
@@ -83,7 +85,18 @@ window.App = window.App || {};
         ...s,
         beetles: s.beetles.map((b) => {
           if (b.id !== s.activeBeetleId) return b;
-          const updated = { ...b, lifeStage: fields.stage, moltEvents: [...(b.moltEvents || []), event] };
+          const updated = {
+            ...b,
+            lifeStage: fields.stage,
+            moltEvents: [...(b.moltEvents || []), event],
+            reminders: {
+              ...b.reminders,
+              substrate: {
+                ...b.reminders.substrate,
+                frequencyDays: Storage.SUBSTRATE_FREQUENCY_BY_STAGE[fields.stage],
+              },
+            },
+          };
           return Storage.recomputeStreak(Storage.addPoints(updated, Storage.POINTS.moltEvent));
         }),
       }));
