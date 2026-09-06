@@ -1,11 +1,12 @@
 // Feature 3: temperature & humidity log — manual entry + a simple line chart.
 // No charting library is loaded (no build step), so the chart is a small
 // hand-rolled SVG polyline.
+// Restyled as "specimen record cards" (preview — see specimenTheme.jsx).
 window.App = window.App || {};
 
 (function () {
   const { useState } = React;
-  const { Button, Card } = window.App.UI;
+  const { SPECIMEN_PALETTE, SpecimenCard, SpecimenButton } = window.App.SpecimenTheme;
   const { useI18n } = window.App.I18n;
 
   // Reference range for the Rainbow Stag Beetle (Phalacrognathus muelleri)
@@ -53,8 +54,8 @@ window.App = window.App || {};
             y={yFor(referenceRange[1])}
             width={w}
             height={yFor(referenceRange[0]) - yFor(referenceRange[1])}
-            fill="#22c55e"
-            opacity="0.12"
+            fill={SPECIMEN_PALETTE.metallic}
+            opacity="0.16"
           />
         )}
         <polyline
@@ -77,18 +78,24 @@ window.App = window.App || {};
     if (points.length === 0) return null;
     const latest = points[points.length - 1].value;
     return (
-      <Card className="mb-4">
+      <SpecimenCard className="mb-4">
         <div className="flex items-baseline justify-between mb-2">
-          <h3 className="text-sm font-extrabold text-stone-800">{title}</h3>
-          <span className="text-xs font-bold text-stone-400">
-            {t("climate.latest")}: <span className="font-extrabold text-stone-700">{latest}{unit}</span>
+          <h3 className="text-sm font-extrabold" style={{ color: SPECIMEN_PALETTE.ink }}>
+            {title}
+          </h3>
+          <span className="text-xs font-bold" style={{ color: `${SPECIMEN_PALETTE.ink}80` }}>
+            {t("climate.latest")}:{" "}
+            <span className="font-extrabold" style={{ color: SPECIMEN_PALETTE.ink }}>
+              {latest}
+              {unit}
+            </span>
           </span>
         </div>
         <MiniLineChart points={points} color={color} referenceRange={referenceRange} />
-        <p className="text-[11px] font-bold text-emerald-600 mt-1">
+        <p className="text-[11px] font-bold mt-1" style={{ color: SPECIMEN_PALETTE.metallic }}>
           {t("climate.idealRange", { lo: referenceRange[0], hi: referenceRange[1], unit })}
         </p>
-      </Card>
+      </SpecimenCard>
     );
   }
 
@@ -108,23 +115,31 @@ window.App = window.App || {};
       onSave({ date, temperature, humidity });
     }
 
+    const inputStyle = { borderColor: `${SPECIMEN_PALETTE.ink}33`, backgroundColor: SPECIMEN_PALETTE.paper, color: SPECIMEN_PALETTE.ink };
+    const labelStyle = { color: `${SPECIMEN_PALETTE.ink}99` };
+
     return (
-      <Card className="mb-4">
+      <SpecimenCard className="mb-4">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-bold text-stone-500">{t("diary.date")}</span>
+            <span className="text-sm font-bold" style={labelStyle}>
+              {t("diary.date")}
+            </span>
             <input
               type="date"
               value={date}
               max={todayInputValue()}
               onChange={(e) => setDate(e.target.value)}
-              className="rounded-xl border-4 border-stone-300 bg-white text-stone-800 font-bold px-3 py-2 outline-none focus:border-amber-400"
+              className="rounded-xl border font-bold px-3 py-2 outline-none"
+              style={inputStyle}
             />
           </label>
 
           <div className="grid grid-cols-2 gap-3">
             <label className="flex flex-col gap-1">
-              <span className="text-sm font-bold text-stone-500">{t("climate.temperature")}</span>
+              <span className="text-sm font-bold" style={labelStyle}>
+                {t("climate.temperature")}
+              </span>
               <input
                 type="number"
                 step="0.1"
@@ -132,11 +147,14 @@ window.App = window.App || {};
                 value={temperature}
                 onChange={(e) => setTemperature(e.target.value)}
                 placeholder="25"
-                className="rounded-xl border-4 border-stone-300 bg-white text-stone-800 font-bold px-3 py-2 outline-none focus:border-amber-400"
+                className="rounded-xl border font-bold px-3 py-2 outline-none"
+                style={inputStyle}
               />
             </label>
             <label className="flex flex-col gap-1">
-              <span className="text-sm font-bold text-stone-500">{t("climate.humidity")}</span>
+              <span className="text-sm font-bold" style={labelStyle}>
+                {t("climate.humidity")}
+              </span>
               <input
                 type="number"
                 step="1"
@@ -144,23 +162,24 @@ window.App = window.App || {};
                 value={humidity}
                 onChange={(e) => setHumidity(e.target.value)}
                 placeholder="70"
-                className="rounded-xl border-4 border-stone-300 bg-white text-stone-800 font-bold px-3 py-2 outline-none focus:border-amber-400"
+                className="rounded-xl border font-bold px-3 py-2 outline-none"
+                style={inputStyle}
               />
             </label>
           </div>
 
-          {error && <p className="text-xs font-bold text-rose-500">{error}</p>}
+          {error && <p className="text-xs font-bold" style={{ color: "#A6472E" }}>{error}</p>}
 
           <div className="flex gap-3 mt-1">
-            <Button type="submit" color="blue" className="flex-1">
+            <SpecimenButton type="submit" color="sky" className="flex-1">
               {t("climate.saveReading")}
-            </Button>
-            <Button type="button" color="red" className="flex-1" onClick={onCancel}>
+            </SpecimenButton>
+            <SpecimenButton type="button" color="ink" className="flex-1" onClick={onCancel}>
               {t("form.cancel")}
-            </Button>
+            </SpecimenButton>
           </div>
         </form>
-      </Card>
+      </SpecimenCard>
     );
   }
 
@@ -172,13 +191,22 @@ window.App = window.App || {};
     }
 
     return (
-      <div className="flex items-center gap-3 bg-white border-4 border-lime-200 rounded-2xl shadow-[0_4px_0_rgba(101,163,13,0.15)] px-4 py-2.5">
-        <span className="text-xs font-extrabold text-violet-500 w-14 shrink-0">{formatDate(reading.date, lang)}</span>
-        <div className="flex gap-4 text-sm font-bold text-stone-700">
+      <div
+        className="flex items-center gap-3 rounded-2xl px-4 py-2.5 border"
+        style={{
+          backgroundColor: SPECIMEN_PALETTE.paper,
+          borderColor: `${SPECIMEN_PALETTE.metallic}33`,
+          boxShadow: "0 1px 2px rgba(59,46,34,0.08), 0 3px 6px rgba(59,46,34,0.08)",
+        }}
+      >
+        <span className="text-xs font-extrabold w-14 shrink-0" style={{ color: SPECIMEN_PALETTE.sky }}>
+          {formatDate(reading.date, lang)}
+        </span>
+        <div className="flex gap-4 text-sm font-bold" style={{ color: SPECIMEN_PALETTE.ink }}>
           {reading.temperature != null && <span>🌡️ {reading.temperature}°C</span>}
           {reading.humidity != null && <span>💧 {reading.humidity}%</span>}
         </div>
-        <button onClick={handleDelete} className="ml-auto shrink-0 text-lg px-1 text-stone-300">
+        <button onClick={handleDelete} className="ml-auto shrink-0 text-lg px-1" style={{ color: `${SPECIMEN_PALETTE.ink}4D` }}>
           🗑️
         </button>
       </div>
@@ -204,38 +232,42 @@ window.App = window.App || {};
 
     return (
       <div>
-        <Card className="mb-4 bg-amber-50 border-amber-200">
-          <p className="text-sm font-bold text-stone-700">{t("climate.referenceRangeNote")}</p>
-        </Card>
+        <SpecimenCard className="mb-4">
+          <p className="text-sm font-bold" style={{ color: SPECIMEN_PALETTE.ink }}>
+            {t("climate.referenceRangeNote")}
+          </p>
+        </SpecimenCard>
 
         {adding ? (
           <TempReadingForm onSave={handleSave} onCancel={() => setAdding(false)} />
         ) : (
-          <Button color="blue" className="w-full mb-4" onClick={() => setAdding(true)}>
+          <SpecimenButton color="sky" className="w-full mb-4" onClick={() => setAdding(true)}>
             {t("climate.logReading")}
-          </Button>
+          </SpecimenButton>
         )}
 
         <ChartCard
           title={t("climate.tempChartTitle")}
           points={tempPoints}
-          color="#f59e0b"
+          color={SPECIMEN_PALETTE.amber}
           unit="°C"
           referenceRange={REFERENCE_RANGE.temperature}
         />
         <ChartCard
           title={t("climate.humidityChartTitle")}
           points={humidityPoints}
-          color="#0ea5e9"
+          color={SPECIMEN_PALETTE.sky}
           unit="%"
           referenceRange={REFERENCE_RANGE.humidity}
         />
 
         {readings.length === 0 ? (
-          <Card className="text-center">
+          <SpecimenCard className="text-center">
             <p className="text-4xl mb-2">🌡️</p>
-            <p className="text-stone-500 font-bold">{t("climate.empty", { name: beetle.name })}</p>
-          </Card>
+            <p className="font-bold" style={{ color: `${SPECIMEN_PALETTE.ink}99` }}>
+              {t("climate.empty", { name: beetle.name })}
+            </p>
+          </SpecimenCard>
         ) : (
           <div className="flex flex-col gap-2">
             {recent.map((reading) => (

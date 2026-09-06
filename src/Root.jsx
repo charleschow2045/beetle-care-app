@@ -18,6 +18,7 @@ window.App = window.App || {};
     TodayOverview,
   } = window.App;
   const { Card } = window.App.UI;
+  const { SPECIMEN_PALETTE } = window.App.SpecimenTheme;
   const { useI18n } = window.App.I18n;
 
   const TAB_KEYS = ["missions", "diary", "growth", "climate", "explore", "quiz"];
@@ -26,16 +27,26 @@ window.App = window.App || {};
   function LanguageToggle() {
     const { lang, setLang } = useI18n();
     return (
-      <div className="flex rounded-xl border-4 border-stone-200 overflow-hidden shrink-0">
+      <div className="flex rounded-xl overflow-hidden shrink-0" style={{ border: `1px solid ${SPECIMEN_PALETTE.metallic}4D` }}>
         <button
           onClick={() => setLang("en")}
-          className={`px-3 py-1.5 text-xs font-extrabold ${lang === "en" ? "bg-amber-400 text-amber-950" : "bg-white text-stone-400"}`}
+          className="px-3 py-1.5 text-xs font-extrabold"
+          style={
+            lang === "en"
+              ? { backgroundColor: SPECIMEN_PALETTE.metallic, color: SPECIMEN_PALETTE.paper }
+              : { backgroundColor: SPECIMEN_PALETTE.paper, color: `${SPECIMEN_PALETTE.ink}80` }
+          }
         >
           EN
         </button>
         <button
           onClick={() => setLang("zh")}
-          className={`px-3 py-1.5 text-xs font-extrabold ${lang === "zh" ? "bg-amber-400 text-amber-950" : "bg-white text-stone-400"}`}
+          className="px-3 py-1.5 text-xs font-extrabold"
+          style={
+            lang === "zh"
+              ? { backgroundColor: SPECIMEN_PALETTE.metallic, color: SPECIMEN_PALETTE.paper }
+              : { backgroundColor: SPECIMEN_PALETTE.paper, color: `${SPECIMEN_PALETTE.ink}80` }
+          }
         >
           中文
         </button>
@@ -185,15 +196,22 @@ window.App = window.App || {};
 
     if (state.beetles.length === 0) {
       return (
-        <div className="min-h-screen bg-lime-50 text-stone-800 px-4 py-8">
+        <div
+          className="min-h-screen px-4 py-8"
+          style={{ backgroundColor: SPECIMEN_PALETTE.paper, color: SPECIMEN_PALETTE.ink }}
+        >
           <div className="flex items-start justify-between gap-3 mb-1">
-            <h1 className="text-3xl font-extrabold tracking-tight text-amber-600">🪲 {t("app.title")}</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: SPECIMEN_PALETTE.metallic }}>
+              🪲 {t("app.title")}
+            </h1>
             <div className="flex items-center gap-2">
               <LanguageToggle />
               <BackupSettings onRestore={restoreFromBackup} />
             </div>
           </div>
-          <p className="text-stone-500 font-bold mb-6">{t("app.emptyStateSubtitle")}</p>
+          <p className="font-bold mb-6" style={{ color: `${SPECIMEN_PALETTE.ink}99` }}>
+            {t("app.emptyStateSubtitle")}
+          </p>
           <Card>
             <BeetleSetupForm onSave={addBeetle} showCancel={false} />
           </Card>
@@ -202,9 +220,11 @@ window.App = window.App || {};
     }
 
     return (
-      <div className="min-h-screen bg-lime-50 text-stone-800 pb-10">
+      <div className="min-h-screen pb-10" style={{ backgroundColor: SPECIMEN_PALETTE.paper, color: SPECIMEN_PALETTE.ink }}>
         <header className="px-4 pt-6 pb-3 flex items-start justify-between gap-3">
-          <h1 className="text-3xl font-extrabold tracking-tight text-amber-600">🪲 {t("app.title")}</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: SPECIMEN_PALETTE.metallic }}>
+            🪲 {t("app.title")}
+          </h1>
           <div className="flex items-center gap-2">
             <LanguageToggle />
             <BackupSettings onRestore={restoreFromBackup} />
@@ -239,12 +259,22 @@ window.App = window.App || {};
                   <button
                     key={key}
                     onClick={() => setActiveTab(key)}
-                    className={`rounded-2xl border-4 font-extrabold py-2.5 text-xs sm:text-sm transition-all
-                      ${
-                        activeTab === key
-                          ? "bg-violet-400 border-violet-600 text-violet-950 shadow-[0_4px_0_#4c1d95] -translate-y-0.5"
-                          : "bg-white border-stone-200 text-stone-400"
-                      }`}
+                    className="rounded-2xl border font-extrabold py-2.5 text-xs sm:text-sm transition-all"
+                    style={
+                      activeTab === key
+                        ? {
+                            backgroundColor: SPECIMEN_PALETTE.metallic,
+                            borderColor: SPECIMEN_PALETTE.metallic,
+                            color: SPECIMEN_PALETTE.paper,
+                            boxShadow: "0 3px 0 #2c4a3c",
+                            transform: "translateY(-2px)",
+                          }
+                        : {
+                            backgroundColor: SPECIMEN_PALETTE.paper,
+                            borderColor: `${SPECIMEN_PALETTE.metallic}4D`,
+                            color: `${SPECIMEN_PALETTE.ink}80`,
+                          }
+                    }
                   >
                     {TAB_EMOJI[key]} {t("nav." + key)}
                   </button>

@@ -1,11 +1,27 @@
-// Feature 1: recurring care reminders dashboard
+// Feature 1: recurring care reminders dashboard.
+// Restyled as "specimen record cards" (preview — see specimenTheme.jsx) —
+// this is the app's home Dashboard screen.
 window.App = window.App || {};
 
 (function () {
   const { useState } = React;
   const { Storage } = window.App;
-  const { Button, Card } = window.App.UI;
+  const { SPECIMEN_PALETTE, SpecimenCard, SpecimenButton } = window.App.SpecimenTheme;
   const { useI18n } = window.App.I18n;
+
+  // Not part of the given palette — a rust/terracotta accent for the
+  // "overdue" alert state, chosen to read as urgent while still fitting the
+  // earthy specimen-card look rather than a jarring stock red.
+  const OVERDUE_COLOR = "#A6472E";
+
+  // One accent per reminder type, each from the given palette, used once.
+  const TYPE_ACCENT = {
+    jelly: SPECIMEN_PALETTE.amber,
+    substrate: SPECIMEN_PALETTE.moss,
+    water: SPECIMEN_PALETTE.sky,
+    wood: SPECIMEN_PALETTE.metallic,
+  };
+  const TYPE_BUTTON_COLOR = { jelly: "amber", substrate: "moss", water: "sky", wood: "metallic" };
 
   function ReminderCard({ type, reminder, onMarkDone, onFrequencyChange }) {
     const { t } = useI18n();
@@ -14,6 +30,7 @@ window.App = window.App || {};
     const days = Storage.daysUntilDue(reminder);
     const overdue = days < 0;
     const dueSoon = days >= 0 && days <= 1;
+    const accent = TYPE_ACCENT[type.key] || SPECIMEN_PALETTE.metallic;
 
     function dueLabel() {
       if (overdue) return t("dashboard.overdue", { n: Math.abs(days) });
@@ -22,7 +39,7 @@ window.App = window.App || {};
       return t("dashboard.daysLeft", { n: days });
     }
 
-    const barColor = overdue ? "bg-rose-500" : dueSoon ? "bg-amber-400" : "bg-emerald-400";
+    const statusColor = overdue ? OVERDUE_COLOR : dueSoon ? SPECIMEN_PALETTE.amber : SPECIMEN_PALETTE.metallic;
     const pctElapsed = Math.max(
       0,
       Math.min(100, Math.round(((reminder.frequencyDays - days) / reminder.frequencyDays) * 100))
@@ -36,14 +53,17 @@ window.App = window.App || {};
     }
 
     return (
-      <Card>
+      <SpecimenCard>
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="text-3xl">{type.emoji}</span>
             <div>
-              <h3 className="text-lg font-extrabold text-stone-800 leading-tight">{t("reminder." + type.key)}</h3>
+              <h3 className="text-lg font-extrabold leading-tight" style={{ color: SPECIMEN_PALETTE.ink }}>
+                {t("reminder." + type.key)}
+              </h3>
               <button
-                className="text-xs text-stone-400 underline decoration-dotted"
+                className="text-xs underline decoration-dotted"
+                style={{ color: `${SPECIMEN_PALETTE.ink}99` }}
                 onClick={() => {
                   setDraftDays(reminder.frequencyDays);
                   setEditing((v) => !v);
@@ -54,16 +74,15 @@ window.App = window.App || {};
             </div>
           </div>
           <span
-            className={`text-sm font-extrabold px-3 py-1 rounded-full whitespace-nowrap ${
-              overdue ? "bg-rose-500 text-white" : dueSoon ? "bg-amber-400 text-amber-950" : "bg-emerald-400 text-emerald-950"
-            }`}
+            className="text-sm font-extrabold px-3 py-1 rounded-full whitespace-nowrap"
+            style={{ backgroundColor: statusColor, color: SPECIMEN_PALETTE.paper }}
           >
             {dueLabel()}
           </span>
         </div>
 
-        <div className="mt-3 h-3 w-full rounded-full bg-stone-200 overflow-hidden">
-          <div className={`h-full ${barColor}`} style={{ width: `${pctElapsed}%` }} />
+        <div className="mt-3 h-3 w-full rounded-full overflow-hidden" style={{ backgroundColor: `${SPECIMEN_PALETTE.ink}1A` }}>
+          <div className="h-full" style={{ width: `${pctElapsed}%`, backgroundColor: statusColor }} />
         </div>
 
         {editing && (
@@ -73,19 +92,22 @@ window.App = window.App || {};
               min="1"
               value={draftDays}
               onChange={(e) => setDraftDays(e.target.value)}
-              className="w-20 rounded-xl border-4 border-stone-300 bg-white text-stone-800 font-bold px-2 py-1 outline-none focus:border-amber-400"
+              className="w-20 rounded-xl border font-bold px-2 py-1 outline-none"
+              style={{ borderColor: `${SPECIMEN_PALETTE.ink}33`, backgroundColor: SPECIMEN_PALETTE.paper, color: SPECIMEN_PALETTE.ink }}
             />
-            <span className="text-stone-500 text-sm font-bold">{t("dashboard.daysUnit")}</span>
-            <Button type="submit" color="blue" className="ml-auto px-3 py-1.5 text-sm">
+            <span className="text-sm font-bold" style={{ color: `${SPECIMEN_PALETTE.ink}99` }}>
+              {t("dashboard.daysUnit")}
+            </span>
+            <SpecimenButton type="submit" color="sky" className="ml-auto px-3 py-1.5 text-sm">
               {t("dashboard.save")}
-            </Button>
+            </SpecimenButton>
           </form>
         )}
 
-        <Button color="gold" className="mt-4 w-full" onClick={onMarkDone}>
+        <SpecimenButton color={TYPE_BUTTON_COLOR[type.key] || "metallic"} className="mt-4 w-full" onClick={onMarkDone}>
           {t("dashboard.markDone")}
-        </Button>
-      </Card>
+        </SpecimenButton>
+      </SpecimenCard>
     );
   }
 
@@ -99,11 +121,11 @@ window.App = window.App || {};
     return (
       <div>
         {pausedTypes.length > 0 && (
-          <Card className="mb-4 bg-amber-50 border-amber-200">
-            <p className="text-sm font-bold text-amber-700">
+          <SpecimenCard className="mb-4">
+            <p className="text-sm font-bold" style={{ color: SPECIMEN_PALETTE.moss }}>
               {pausedTypes.map((type) => type.emoji).join(" ")} {t("dashboard.pausedForPupa")}
             </p>
-          </Card>
+          </SpecimenCard>
         )}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {visibleTypes.map((type) => (
