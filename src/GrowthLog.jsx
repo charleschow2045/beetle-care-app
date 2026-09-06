@@ -12,15 +12,15 @@ window.App = window.App || {};
   const STAGE_TIPS = {
     larva: {
       en: "Larvae do best left undisturbed in their substrate — avoid digging them up, and keep humidity moderate.",
-      zh: "幼蟲期間盡量唔好搞佢，等佢喺木屑入面慢慢長大，濕度保持適中就得。",
+      zh: "幼蟲階段應盡量避免打擾，讓牠在木屑中慢慢成長，保持濕度適中即可。",
     },
     pupa: {
       en: "Pupating beetles are extremely fragile — don't dig into or move the substrate, just wait for eclosion.",
-      zh: "化蛹階段嘅甲蟲好脆弱，唔好挖動或者搬動木屑，靜靜哋等佢羽化就得。",
+      zh: "化蛹階段的甲蟲十分脆弱，切勿挖動或搬動木屑，靜待牠羽化即可。",
     },
     adult: {
       en: "A freshly-eclosed adult needs time for its shell to harden — hold off on jelly for now and just keep the enclosure lightly misted.",
-      zh: "啱啱羽化嘅成蟲需要時間畀外殼變硬，未必要即刻餵果凍，噴少少水保持濕度就得。",
+      zh: "剛羽化的成蟲需要時間讓外殼變硬，未必需要立即餵食果凍，噴少量水保持濕度即可。",
     },
   };
 
