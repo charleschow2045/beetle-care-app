@@ -5,8 +5,12 @@ window.App = window.App || {};
 
 (function () {
   const { useState } = React;
-  const { Button, Card } = window.App.UI;
+  const { SPECIMEN_PALETTE, SpecimenCard, SpecimenButton } = window.App.SpecimenTheme;
   const { useI18n } = window.App.I18n;
+
+  // Not part of the given palette — same rust/terracotta alert accent used
+  // for "overdue" in ReminderDashboard.jsx, reused here for a wrong answer.
+  const WRONG_COLOR = "#A6472E";
 
   const QUIZ_LENGTH = 10;
 
@@ -337,37 +341,51 @@ window.App = window.App || {};
     if (finished) {
       const badge = badgeForScore(score, sessionQuestions.length, t);
       return (
-        <Card className="text-center">
+        <SpecimenCard className="text-center">
           <div className="text-6xl mb-2">{badge.emoji}</div>
-          <h2 className="text-2xl font-extrabold text-stone-800">{badge.label}</h2>
-          <p className="text-stone-500 font-bold mt-1">{t("quiz.scored", { score, total: sessionQuestions.length })}</p>
-          <Button color="gold" className="mt-4 w-full" onClick={restart}>
+          <h2 className="text-2xl font-extrabold" style={{ color: SPECIMEN_PALETTE.ink }}>
+            {badge.label}
+          </h2>
+          <p className="font-bold mt-1" style={{ color: `${SPECIMEN_PALETTE.ink}99` }}>
+            {t("quiz.scored", { score, total: sessionQuestions.length })}
+          </p>
+          <SpecimenButton color="amber" className="mt-4 w-full" onClick={restart}>
             {t("quiz.tryAgain")}
-          </Button>
-        </Card>
+          </SpecimenButton>
+        </SpecimenCard>
       );
     }
 
     return (
-      <Card>
-        <p className="text-xs font-bold text-stone-400 mb-1">
+      <SpecimenCard>
+        <p className="text-xs font-bold mb-1" style={{ color: `${SPECIMEN_PALETTE.ink}80` }}>
           {t("quiz.questionOf", { i: index + 1, n: sessionQuestions.length })}
         </p>
-        <h2 className="text-lg font-extrabold text-stone-800 mb-4">{question.q[lang] || question.q.en}</h2>
+        <h2 className="text-lg font-extrabold mb-4" style={{ color: SPECIMEN_PALETTE.ink }}>
+          {question.q[lang] || question.q.en}
+        </h2>
 
         <div className="flex flex-col gap-2">
           {(question.options[lang] || question.options.en).map((opt, i) => {
-            let style = "bg-stone-50 border-stone-200 text-stone-700";
+            let style = {
+              backgroundColor: `${SPECIMEN_PALETTE.ink}08`,
+              borderColor: `${SPECIMEN_PALETTE.ink}26`,
+              color: SPECIMEN_PALETTE.ink,
+            };
             if (selected !== null) {
-              if (i === question.correct) style = "bg-emerald-400 border-emerald-600 text-emerald-950";
-              else if (i === selected) style = "bg-rose-400 border-rose-600 text-rose-950";
+              if (i === question.correct) {
+                style = { backgroundColor: `${SPECIMEN_PALETTE.moss}26`, borderColor: SPECIMEN_PALETTE.moss, color: SPECIMEN_PALETTE.moss };
+              } else if (i === selected) {
+                style = { backgroundColor: `${WRONG_COLOR}26`, borderColor: WRONG_COLOR, color: WRONG_COLOR };
+              }
             }
             return (
               <button
                 key={i}
                 onClick={() => choose(i)}
                 disabled={selected !== null}
-                className={`text-left rounded-xl border-4 font-bold px-4 py-3 transition-all ${style}`}
+                className="text-left rounded-xl border-4 font-bold px-4 py-3 transition-all"
+                style={style}
               >
                 {opt}
               </button>
@@ -377,13 +395,15 @@ window.App = window.App || {};
 
         {selected !== null && (
           <div className="mt-4">
-            <p className="text-sm text-stone-600 font-bold">{question.explain[lang] || question.explain.en}</p>
-            <Button color="blue" className="mt-3 w-full" onClick={next}>
+            <p className="text-sm font-bold" style={{ color: `${SPECIMEN_PALETTE.ink}CC` }}>
+              {question.explain[lang] || question.explain.en}
+            </p>
+            <SpecimenButton color="sky" className="mt-3 w-full" onClick={next}>
               {index + 1 >= sessionQuestions.length ? t("quiz.seeResults") : t("quiz.next")}
-            </Button>
+            </SpecimenButton>
           </div>
         )}
-      </Card>
+      </SpecimenCard>
     );
   }
 

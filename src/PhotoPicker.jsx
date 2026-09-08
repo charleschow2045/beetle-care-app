@@ -3,7 +3,12 @@ window.App = window.App || {};
 
 (function () {
   const { useState } = React;
+  const { SPECIMEN_PALETTE } = window.App.SpecimenTheme;
   const { useI18n } = window.App.I18n;
+
+  // Same rust/terracotta alert accent used elsewhere for "overdue"/"wrong" —
+  // reused here for the destructive "remove photo" action and error text.
+  const ALERT_COLOR = "#A6472E";
 
   function resizeImageFile(file, maxDim = 800, quality = 0.82) {
     return new Promise((resolve, reject) => {
@@ -55,24 +60,36 @@ window.App = window.App || {};
 
     return (
       <div className="flex flex-col gap-2">
-        <span className="text-sm font-bold text-stone-500">{label || t("photo.label")}</span>
+        <span className="text-sm font-bold" style={{ color: `${SPECIMEN_PALETTE.ink}99` }}>
+          {label || t("photo.label")}
+        </span>
         <div className="flex items-center gap-3">
-          <div className="w-20 h-20 rounded-2xl overflow-hidden border-4 border-stone-200 bg-stone-100 flex items-center justify-center shrink-0">
+          <div
+            className="w-20 h-20 rounded-2xl overflow-hidden border flex items-center justify-center shrink-0"
+            style={{ borderColor: `${SPECIMEN_PALETTE.metallic}4D`, backgroundColor: `${SPECIMEN_PALETTE.metallic}0D` }}
+          >
             {value ? <img src={value} alt="" className="w-full h-full object-cover" /> : <span className="text-3xl">🪲</span>}
           </div>
           <div className="flex flex-col gap-2">
-            <label className="cursor-pointer inline-block text-center rounded-xl border-4 border-lime-600 bg-lime-400 text-lime-950 font-extrabold text-sm px-3 py-2 active:translate-y-[2px] transition-all">
+            <label
+              className="cursor-pointer inline-block text-center rounded-xl font-extrabold text-sm px-3 py-2 active:translate-y-[2px] transition-all"
+              style={{ backgroundColor: SPECIMEN_PALETTE.metallic, color: SPECIMEN_PALETTE.paper, boxShadow: "0 2px 0 #2c4a3c" }}
+            >
               {value ? t("photo.changePhoto") : t("photo.addPhoto")}
               <input type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
             </label>
             {value && (
-              <button type="button" onClick={() => onChange("")} className="text-xs font-bold text-rose-500 underline">
+              <button type="button" onClick={() => onChange("")} className="text-xs font-bold underline" style={{ color: ALERT_COLOR }}>
                 {t("photo.removePhoto")}
               </button>
             )}
           </div>
         </div>
-        {error && <p className="text-xs font-bold text-rose-500">{error}</p>}
+        {error && (
+          <p className="text-xs font-bold" style={{ color: ALERT_COLOR }}>
+            {error}
+          </p>
+        )}
       </div>
     );
   }

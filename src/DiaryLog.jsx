@@ -4,8 +4,15 @@ window.App = window.App || {};
 (function () {
   const { useState } = React;
   const { PhotoPicker } = window.App;
-  const { Button, Card, Modal } = window.App.UI;
+  const { SPECIMEN_PALETTE, SpecimenCard, SpecimenButton, SpecimenModal } = window.App.SpecimenTheme;
   const { useI18n } = window.App.I18n;
+
+  const inputStyle = {
+    borderColor: `${SPECIMEN_PALETTE.ink}33`,
+    backgroundColor: SPECIMEN_PALETTE.paper,
+    color: SPECIMEN_PALETTE.ink,
+  };
+  const labelStyle = { color: `${SPECIMEN_PALETTE.ink}99` };
 
   function todayInputValue() {
     const d = new Date();
@@ -34,43 +41,49 @@ window.App = window.App || {};
     }
 
     return (
-      <Card className="mb-4">
+      <SpecimenCard className="mb-4">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <PhotoPicker value={photoDataUrl} onChange={setPhotoDataUrl} label={t("diary.photoLabel")} />
 
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-bold text-stone-500">{t("diary.whatHappened")}</span>
+            <span className="text-sm font-bold" style={labelStyle}>
+              {t("diary.whatHappened")}
+            </span>
             <textarea
               autoFocus
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder={t("diary.notePlaceholder")}
               rows={3}
-              className="rounded-xl border-4 border-stone-300 bg-white text-stone-800 font-bold px-4 py-3 outline-none focus:border-violet-400 resize-none"
+              className="rounded-xl border font-bold px-4 py-3 outline-none resize-none"
+              style={inputStyle}
             />
           </label>
 
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-bold text-stone-500">{t("diary.date")}</span>
+            <span className="text-sm font-bold" style={labelStyle}>
+              {t("diary.date")}
+            </span>
             <input
               type="date"
               value={date}
               max={todayInputValue()}
               onChange={(e) => setDate(e.target.value)}
-              className="rounded-xl border-4 border-stone-300 bg-white text-stone-800 font-bold px-3 py-2 outline-none focus:border-violet-400"
+              className="rounded-xl border font-bold px-3 py-2 outline-none"
+              style={inputStyle}
             />
           </label>
 
           <div className="flex gap-3 mt-1">
-            <Button type="submit" color="purple" className="flex-1">
+            <SpecimenButton type="submit" color="moss" className="flex-1">
               {t("diary.saveEntry")}
-            </Button>
-            <Button type="button" color="red" className="flex-1" onClick={onCancel}>
+            </SpecimenButton>
+            <SpecimenButton type="button" color="ink" className="flex-1" onClick={onCancel}>
               {t("diary.cancel")}
-            </Button>
+            </SpecimenButton>
           </div>
         </form>
-      </Card>
+      </SpecimenCard>
     );
   }
 
@@ -79,9 +92,17 @@ window.App = window.App || {};
     return (
       <button
         onClick={onOpen}
-        className="w-full flex items-center gap-3 bg-white border-4 border-lime-200 rounded-2xl shadow-[0_4px_0_rgba(101,163,13,0.15)] p-3 text-left active:translate-y-[2px] active:shadow-none transition-all"
+        className="w-full flex items-center gap-3 rounded-2xl p-3 text-left border transition-all active:translate-y-[2px]"
+        style={{
+          backgroundColor: SPECIMEN_PALETTE.paper,
+          borderColor: `${SPECIMEN_PALETTE.metallic}33`,
+          boxShadow: "0 1px 2px rgba(59,46,34,0.08), 0 3px 6px rgba(59,46,34,0.08)",
+        }}
       >
-        <div className="w-16 h-16 rounded-xl overflow-hidden border-4 border-stone-200 bg-stone-100 flex items-center justify-center shrink-0">
+        <div
+          className="w-16 h-16 rounded-xl overflow-hidden border flex items-center justify-center shrink-0"
+          style={{ borderColor: `${SPECIMEN_PALETTE.ink}26`, backgroundColor: `${SPECIMEN_PALETTE.ink}0A` }}
+        >
           {entry.photoDataUrl ? (
             <img src={entry.photoDataUrl} alt="" className="w-full h-full object-cover" />
           ) : (
@@ -89,8 +110,12 @@ window.App = window.App || {};
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-extrabold text-violet-500">{formatDate(entry.date, lang)}</p>
-          <p className="text-stone-800 font-bold text-sm leading-snug line-clamp-2">{entry.note}</p>
+          <p className="text-xs font-extrabold" style={{ color: SPECIMEN_PALETTE.moss }}>
+            {formatDate(entry.date, lang)}
+          </p>
+          <p className="font-bold text-sm leading-snug line-clamp-2" style={{ color: SPECIMEN_PALETTE.ink }}>
+            {entry.note}
+          </p>
         </div>
       </button>
     );
@@ -107,33 +132,41 @@ window.App = window.App || {};
     }
 
     return (
-      <Modal open={!!entry} onClose={onClose}>
+      <SpecimenModal open={!!entry} onClose={onClose}>
         {entry && (
           <div className="flex flex-col gap-3">
             {entry.photoDataUrl ? (
               <img
                 src={entry.photoDataUrl}
                 alt=""
-                className="w-full max-h-72 object-cover rounded-2xl border-4 border-lime-100"
+                className="w-full max-h-72 object-cover rounded-2xl"
+                style={{ border: `2px solid ${SPECIMEN_PALETTE.metallic}4D` }}
               />
             ) : (
-              <div className="w-full h-28 rounded-2xl border-4 border-dashed border-lime-200 bg-lime-50 flex items-center justify-center text-5xl">
+              <div
+                className="w-full h-28 rounded-2xl border-2 border-dashed flex items-center justify-center text-5xl"
+                style={{ borderColor: `${SPECIMEN_PALETTE.metallic}4D`, backgroundColor: `${SPECIMEN_PALETTE.metallic}0D` }}
+              >
                 📔
               </div>
             )}
-            <p className="text-xs font-extrabold text-violet-500">{formatDate(entry.date, lang)}</p>
-            <p className="text-stone-800 font-bold whitespace-pre-wrap">{entry.note}</p>
+            <p className="text-xs font-extrabold" style={{ color: SPECIMEN_PALETTE.moss }}>
+              {formatDate(entry.date, lang)}
+            </p>
+            <p className="font-bold whitespace-pre-wrap" style={{ color: SPECIMEN_PALETTE.ink }}>
+              {entry.note}
+            </p>
             <div className="flex gap-3 mt-1">
-              <Button color="purple" className="flex-1" onClick={onClose}>
+              <SpecimenButton color="moss" className="flex-1" onClick={onClose}>
                 {t("diary.close")}
-              </Button>
-              <Button color="red" className="flex-1" onClick={handleDelete}>
+              </SpecimenButton>
+              <SpecimenButton color="ink" className="flex-1" onClick={handleDelete}>
                 {t("action.delete")}
-              </Button>
+              </SpecimenButton>
             </div>
           </div>
         )}
-      </Modal>
+      </SpecimenModal>
     );
   }
 
@@ -156,16 +189,18 @@ window.App = window.App || {};
         {adding ? (
           <DiaryEntryForm onSave={handleSave} onCancel={() => setAdding(false)} />
         ) : (
-          <Button color="purple" className="w-full mb-4" onClick={() => setAdding(true)}>
+          <SpecimenButton color="moss" className="w-full mb-4" onClick={() => setAdding(true)}>
             {t("diary.addEntry")}
-          </Button>
+          </SpecimenButton>
         )}
 
         {entries.length === 0 ? (
-          <Card className="text-center">
+          <SpecimenCard className="text-center">
             <p className="text-4xl mb-2">📔</p>
-            <p className="text-stone-500 font-bold">{t("diary.empty", { name: beetle.name })}</p>
-          </Card>
+            <p className="font-bold" style={{ color: `${SPECIMEN_PALETTE.ink}99` }}>
+              {t("diary.empty", { name: beetle.name })}
+            </p>
+          </SpecimenCard>
         ) : (
           <div className="flex flex-col gap-3">
             {entries.map((entry) => (

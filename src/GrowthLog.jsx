@@ -6,8 +6,15 @@ window.App = window.App || {};
 (function () {
   const { useState } = React;
   const { Storage } = window.App;
-  const { Button, Card } = window.App.UI;
+  const { SPECIMEN_PALETTE, SpecimenCard, SpecimenButton } = window.App.SpecimenTheme;
   const { useI18n } = window.App.I18n;
+
+  const inputStyle = {
+    borderColor: `${SPECIMEN_PALETTE.ink}33`,
+    backgroundColor: SPECIMEN_PALETTE.paper,
+    color: SPECIMEN_PALETTE.ink,
+  };
+  const labelStyle = { color: `${SPECIMEN_PALETTE.ink}99` };
 
   const STAGE_TIPS = {
     larva: {
@@ -45,12 +52,14 @@ window.App = window.App || {};
     const stageInfo = Storage.LIFE_STAGES.find((s) => s.key === stage);
     const tip = STAGE_TIPS[stage][lang] || STAGE_TIPS[stage].en;
     return (
-      <Card className="mb-4 bg-amber-50 border-amber-200">
-        <p className="text-xs font-extrabold text-amber-600 mb-1">
+      <SpecimenCard className="mb-4" style={{ backgroundColor: `${SPECIMEN_PALETTE.amber}14`, borderColor: `${SPECIMEN_PALETTE.amber}66` }}>
+        <p className="text-xs font-extrabold mb-1" style={{ color: SPECIMEN_PALETTE.amber }}>
           {stageInfo.emoji} {t("lifeStage." + stage)} · {t("growth.tipLabel")}
         </p>
-        <p className="text-stone-700 font-bold text-sm">{tip}</p>
-      </Card>
+        <p className="font-bold text-sm" style={{ color: SPECIMEN_PALETTE.ink }}>
+          {tip}
+        </p>
+      </SpecimenCard>
     );
   }
 
@@ -66,18 +75,24 @@ window.App = window.App || {};
     }
 
     return (
-      <Card className="mb-4">
+      <SpecimenCard className="mb-4">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <span className="text-sm font-bold text-stone-500">{t("growth.newStage")}</span>
+            <span className="text-sm font-bold" style={labelStyle}>
+              {t("growth.newStage")}
+            </span>
             <div className="flex gap-2">
               {Storage.LIFE_STAGES.map((s) => (
                 <button
                   key={s.key}
                   type="button"
                   onClick={() => setStage(s.key)}
-                  className={`flex-1 rounded-xl border-4 font-extrabold py-2 text-sm transition-all
-                    ${stage === s.key ? "bg-amber-400 border-amber-600 text-amber-950" : "bg-stone-100 border-stone-300 text-stone-500"}`}
+                  className="flex-1 rounded-xl border font-extrabold py-2 text-sm transition-all"
+                  style={
+                    stage === s.key
+                      ? { backgroundColor: SPECIMEN_PALETTE.amber, borderColor: SPECIMEN_PALETTE.amber, color: SPECIMEN_PALETTE.ink }
+                      : { backgroundColor: `${SPECIMEN_PALETTE.ink}08`, borderColor: `${SPECIMEN_PALETTE.ink}26`, color: `${SPECIMEN_PALETTE.ink}99` }
+                  }
                 >
                   {s.emoji} {t("lifeStage." + s.key)}
                 </button>
@@ -86,37 +101,43 @@ window.App = window.App || {};
           </div>
 
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-bold text-stone-500">{t("diary.date")}</span>
+            <span className="text-sm font-bold" style={labelStyle}>
+              {t("diary.date")}
+            </span>
             <input
               type="date"
               value={date}
               max={todayInputValue()}
               onChange={(e) => setDate(e.target.value)}
-              className="rounded-xl border-4 border-stone-300 bg-white text-stone-800 font-bold px-3 py-2 outline-none focus:border-amber-400"
+              className="rounded-xl border font-bold px-3 py-2 outline-none"
+              style={inputStyle}
             />
           </label>
 
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-bold text-stone-500">{t("growth.noteLabel")}</span>
+            <span className="text-sm font-bold" style={labelStyle}>
+              {t("growth.noteLabel")}
+            </span>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder={t("growth.notePlaceholder")}
               rows={2}
-              className="rounded-xl border-4 border-stone-300 bg-white text-stone-800 font-bold px-4 py-3 outline-none focus:border-amber-400 resize-none"
+              className="rounded-xl border font-bold px-4 py-3 outline-none resize-none"
+              style={inputStyle}
             />
           </label>
 
           <div className="flex gap-3 mt-1">
-            <Button type="submit" color="gold" className="flex-1">
+            <SpecimenButton type="submit" color="amber" className="flex-1">
               {t("growth.saveEvent")}
-            </Button>
-            <Button type="button" color="red" className="flex-1" onClick={onCancel}>
+            </SpecimenButton>
+            <SpecimenButton type="button" color="ink" className="flex-1" onClick={onCancel}>
               {t("form.cancel")}
-            </Button>
+            </SpecimenButton>
           </div>
         </form>
-      </Card>
+      </SpecimenCard>
     );
   }
 
@@ -129,14 +150,29 @@ window.App = window.App || {};
     }
 
     return (
-      <div className="flex items-start gap-3 bg-white border-4 border-lime-200 rounded-2xl shadow-[0_4px_0_rgba(101,163,13,0.15)] p-3">
+      <div
+        className="flex items-start gap-3 rounded-2xl p-3 border"
+        style={{
+          backgroundColor: SPECIMEN_PALETTE.paper,
+          borderColor: `${SPECIMEN_PALETTE.metallic}33`,
+          boxShadow: "0 1px 2px rgba(59,46,34,0.08), 0 3px 6px rgba(59,46,34,0.08)",
+        }}
+      >
         <span className="text-3xl">{stageInfo.emoji}</span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-extrabold text-stone-800">{t("lifeStage." + event.stage)}</p>
-          <p className="text-xs font-extrabold text-violet-500">{formatDate(event.date, lang)}</p>
-          {event.note && <p className="text-stone-600 font-bold text-sm mt-1 whitespace-pre-wrap">{event.note}</p>}
+          <p className="text-sm font-extrabold" style={{ color: SPECIMEN_PALETTE.ink }}>
+            {t("lifeStage." + event.stage)}
+          </p>
+          <p className="text-xs font-extrabold" style={{ color: SPECIMEN_PALETTE.amber }}>
+            {formatDate(event.date, lang)}
+          </p>
+          {event.note && (
+            <p className="font-bold text-sm mt-1 whitespace-pre-wrap" style={{ color: `${SPECIMEN_PALETTE.ink}CC` }}>
+              {event.note}
+            </p>
+          )}
         </div>
-        <button onClick={handleDelete} className="shrink-0 text-lg px-1 text-stone-300">
+        <button onClick={handleDelete} className="shrink-0 text-lg px-1" style={{ color: `${SPECIMEN_PALETTE.ink}4D` }}>
           🗑️
         </button>
       </div>
@@ -163,16 +199,18 @@ window.App = window.App || {};
         {adding ? (
           <GrowthEventForm currentStage={beetle.lifeStage} onSave={handleSave} onCancel={() => setAdding(false)} />
         ) : (
-          <Button color="gold" className="w-full mb-4" onClick={() => setAdding(true)}>
+          <SpecimenButton color="amber" className="w-full mb-4" onClick={() => setAdding(true)}>
             {t("growth.logEvent")}
-          </Button>
+          </SpecimenButton>
         )}
 
         {events.length === 0 ? (
-          <Card className="text-center">
+          <SpecimenCard className="text-center">
             <p className="text-4xl mb-2">🔄</p>
-            <p className="text-stone-500 font-bold">{t("growth.empty", { name: beetle.name })}</p>
-          </Card>
+            <p className="font-bold" style={{ color: `${SPECIMEN_PALETTE.ink}99` }}>
+              {t("growth.empty", { name: beetle.name })}
+            </p>
+          </SpecimenCard>
         ) : (
           <div className="flex flex-col gap-3">
             {events.map((event) => (

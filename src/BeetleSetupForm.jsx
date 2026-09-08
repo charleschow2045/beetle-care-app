@@ -4,9 +4,16 @@ window.App = window.App || {};
 (function () {
   const { useState } = React;
   const { Storage } = window.App;
-  const { Button } = window.App.UI;
+  const { SPECIMEN_PALETTE, SpecimenButton } = window.App.SpecimenTheme;
   const { PhotoPicker } = window.App;
   const { useI18n } = window.App.I18n;
+
+  const inputStyle = {
+    borderColor: `${SPECIMEN_PALETTE.ink}33`,
+    backgroundColor: SPECIMEN_PALETTE.paper,
+    color: SPECIMEN_PALETTE.ink,
+  };
+  const labelStyle = { color: `${SPECIMEN_PALETTE.ink}99` };
 
   function todayInputValue() {
     const d = new Date();
@@ -24,13 +31,16 @@ window.App = window.App || {};
   function DateField({ label, value, onChange }) {
     return (
       <label className="flex flex-col gap-1">
-        <span className="text-sm font-bold text-stone-500">{label}</span>
+        <span className="text-sm font-bold" style={labelStyle}>
+          {label}
+        </span>
         <input
           type="date"
           value={value}
           max={todayInputValue()}
           onChange={(e) => onChange(e.target.value)}
-          className="rounded-xl border-4 border-stone-300 bg-white text-stone-800 font-bold px-3 py-2 outline-none focus:border-amber-400"
+          className="rounded-xl border font-bold px-3 py-2 outline-none"
+          style={inputStyle}
         />
       </label>
     );
@@ -76,36 +86,48 @@ window.App = window.App || {};
         <PhotoPicker value={photoDataUrl} onChange={setPhotoDataUrl} />
 
         <label className="flex flex-col gap-1">
-          <span className="text-sm font-bold text-stone-500">{t("form.nickname")}</span>
+          <span className="text-sm font-bold" style={labelStyle}>
+            {t("form.nickname")}
+          </span>
           <input
             autoFocus
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={t("form.nicknamePlaceholder")}
-            className="rounded-xl border-4 border-stone-300 bg-white text-stone-800 text-lg font-bold px-4 py-3 outline-none focus:border-amber-400"
+            className="rounded-xl border text-lg font-bold px-4 py-3 outline-none"
+            style={inputStyle}
           />
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-sm font-bold text-stone-500">{t("form.species")}</span>
+          <span className="text-sm font-bold" style={labelStyle}>
+            {t("form.species")}
+          </span>
           <input
             value={species}
             onChange={(e) => setSpecies(e.target.value)}
             placeholder={t("form.speciesPlaceholder")}
-            className="rounded-xl border-4 border-stone-300 bg-white text-stone-800 font-bold px-4 py-3 outline-none focus:border-amber-400"
+            className="rounded-xl border font-bold px-4 py-3 outline-none"
+            style={inputStyle}
           />
         </label>
 
         <div className="flex flex-col gap-1">
-          <span className="text-sm font-bold text-stone-500">{t("form.lifeStage")}</span>
+          <span className="text-sm font-bold" style={labelStyle}>
+            {t("form.lifeStage")}
+          </span>
           <div className="flex gap-2">
             {Storage.LIFE_STAGES.map((s) => (
               <button
                 key={s.key}
                 type="button"
                 onClick={() => setLifeStage(s.key)}
-                className={`flex-1 rounded-xl border-4 font-extrabold py-2 text-sm transition-all
-                  ${lifeStage === s.key ? "bg-amber-400 border-amber-600 text-amber-950" : "bg-stone-100 border-stone-300 text-stone-500"}`}
+                className="flex-1 rounded-xl border font-extrabold py-2 text-sm transition-all"
+                style={
+                  lifeStage === s.key
+                    ? { backgroundColor: SPECIMEN_PALETTE.metallic, borderColor: SPECIMEN_PALETTE.metallic, color: SPECIMEN_PALETTE.paper }
+                    : { backgroundColor: `${SPECIMEN_PALETTE.ink}08`, borderColor: `${SPECIMEN_PALETTE.ink}26`, color: `${SPECIMEN_PALETTE.ink}99` }
+                }
               >
                 {s.emoji} {t("lifeStage." + s.key)}
               </button>
@@ -115,8 +137,8 @@ window.App = window.App || {};
 
         <DateField label={t("form.eclosionDate")} value={eclosionDate} onChange={setEclosionDate} />
 
-        <div className="border-t-4 border-dashed border-stone-200 pt-3 mt-1">
-          <p className="text-sm font-bold text-stone-500 mb-2">
+        <div className="border-t-4 border-dashed pt-3 mt-1" style={{ borderColor: `${SPECIMEN_PALETTE.ink}1F` }}>
+          <p className="text-sm font-bold mb-2" style={labelStyle}>
             {isEditing ? t("form.lastCareDatesEdit") : t("form.lastCareDatesNew")}
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -132,24 +154,27 @@ window.App = window.App || {};
         </div>
 
         <label className="flex flex-col gap-1">
-          <span className="text-sm font-bold text-stone-500">{t("form.supplyNotes")}</span>
+          <span className="text-sm font-bold" style={labelStyle}>
+            {t("form.supplyNotes")}
+          </span>
           <textarea
             value={supplyNotes}
             onChange={(e) => setSupplyNotes(e.target.value)}
             placeholder={t("form.supplyNotesPlaceholder")}
             rows={2}
-            className="rounded-xl border-4 border-stone-300 bg-white text-stone-800 font-bold px-4 py-3 outline-none focus:border-amber-400 resize-none"
+            className="rounded-xl border font-bold px-4 py-3 outline-none resize-none"
+            style={inputStyle}
           />
         </label>
 
         <div className="flex gap-3 mt-2">
-          <Button type="submit" color="gold" className="flex-1">
+          <SpecimenButton type="submit" color="amber" className="flex-1">
             {submitLabel || t("form.saveBeetle")}
-          </Button>
+          </SpecimenButton>
           {showCancel && (
-            <Button type="button" color="red" className="flex-1" onClick={onCancel}>
+            <SpecimenButton type="button" color="ink" className="flex-1" onClick={onCancel}>
               {t("form.cancel")}
-            </Button>
+            </SpecimenButton>
           )}
         </div>
       </form>

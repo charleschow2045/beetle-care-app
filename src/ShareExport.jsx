@@ -6,7 +6,7 @@ window.App = window.App || {};
 (function () {
   const { useState } = React;
   const { Storage } = window.App;
-  const { Button, Modal } = window.App.UI;
+  const { SPECIMEN_PALETTE, SpecimenButton, SpecimenModal } = window.App.SpecimenTheme;
   const { useI18n } = window.App.I18n;
 
   function loadImage(src) {
@@ -37,6 +37,8 @@ window.App = window.App || {};
     ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
   }
 
+  // Canvas colors mirror the SpecimenCard/SPECIMEN_PALETTE look used across
+  // the app, so a shared/downloaded card matches what's on screen.
   async function generateShareImage(beetle, t, lang) {
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
@@ -49,19 +51,19 @@ window.App = window.App || {};
     const font = (size, weight) => `${weight || "bold"} ${size}px 'Baloo 2', 'Noto Sans HK', sans-serif`;
 
     const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, "#fef9c3");
-    grad.addColorStop(1, "#ecfccb");
+    grad.addColorStop(0, "#F7F1E5");
+    grad.addColorStop(1, "#EFE7D6");
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
     roundRect(ctx, 30, 30, W - 60, H - 60, 40);
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = SPECIMEN_PALETTE.paper;
     ctx.fill();
-    ctx.lineWidth = 8;
-    ctx.strokeStyle = "#d9f99d";
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = `${SPECIMEN_PALETTE.metallic}4D`;
     ctx.stroke();
 
-    ctx.fillStyle = "#d97706";
+    ctx.fillStyle = SPECIMEN_PALETTE.metallic;
     ctx.font = font(36);
     ctx.textAlign = "center";
     ctx.fillText(`🪲 ${t("app.title")}`, W / 2, 100);
@@ -77,11 +79,11 @@ window.App = window.App || {};
         const img = await loadImage(beetle.photoDataUrl);
         drawCoverImage(ctx, img, photoX, photoY, photoSize, photoSize);
       } catch (e) {
-        ctx.fillStyle = "#ecfccb";
+        ctx.fillStyle = `${SPECIMEN_PALETTE.metallic}1A`;
         ctx.fillRect(photoX, photoY, photoSize, photoSize);
       }
     } else {
-      ctx.fillStyle = "#ecfccb";
+      ctx.fillStyle = `${SPECIMEN_PALETTE.metallic}1A`;
       ctx.fillRect(photoX, photoY, photoSize, photoSize);
       ctx.font = "180px serif";
       ctx.textAlign = "center";
@@ -91,13 +93,13 @@ window.App = window.App || {};
     }
     ctx.restore();
 
-    ctx.fillStyle = "#292524";
+    ctx.fillStyle = SPECIMEN_PALETTE.ink;
     ctx.font = font(52);
     ctx.textAlign = "center";
     ctx.fillText(beetle.name, W / 2, photoY + photoSize + 70);
 
     const stage = Storage.LIFE_STAGES.find((s) => s.key === beetle.lifeStage) || Storage.LIFE_STAGES[0];
-    ctx.fillStyle = "#78716c";
+    ctx.fillStyle = `${SPECIMEN_PALETTE.ink}99`;
     ctx.font = font(28);
     const speciesLine = `${beetle.species || t("profile.speciesNotSet")}  ·  ${stage.emoji} ${t("lifeStage." + stage.key)}`;
     ctx.fillText(speciesLine, W / 2, photoY + photoSize + 115);
@@ -116,18 +118,18 @@ window.App = window.App || {};
     let chipX = (W - (chipW * 3 + gap * 2)) / 2;
     chips.forEach((chip) => {
       roundRect(ctx, chipX, chipY, chipW, chipH, 20);
-      ctx.fillStyle = "#fefce8";
+      ctx.fillStyle = `${SPECIMEN_PALETTE.metallic}14`;
       ctx.fill();
-      ctx.strokeStyle = "#fde68a";
+      ctx.strokeStyle = `${SPECIMEN_PALETTE.metallic}66`;
       ctx.lineWidth = 3;
       ctx.stroke();
-      ctx.fillStyle = "#78350f";
+      ctx.fillStyle = SPECIMEN_PALETTE.ink;
       ctx.font = font(32);
       ctx.textAlign = "center";
       ctx.fillText(`${chip.emoji} ${chip.value}`, chipX + chipW / 2, chipY + 45);
       if (chip.label) {
         ctx.font = font(20, "normal");
-        ctx.fillStyle = "#a8a29e";
+        ctx.fillStyle = `${SPECIMEN_PALETTE.ink}80`;
         ctx.fillText(chip.label, chipX + chipW / 2, chipY + 72);
       }
       chipX += chipW + gap;
@@ -141,7 +143,7 @@ window.App = window.App || {};
 
     let stripY = chipY + chipH + 50;
     if (photos.length > 0) {
-      ctx.fillStyle = "#78716c";
+      ctx.fillStyle = `${SPECIMEN_PALETTE.ink}99`;
       ctx.font = font(24);
       ctx.textAlign = "left";
       ctx.fillText(t("share.recentMoments"), 80, stripY);
@@ -166,7 +168,7 @@ window.App = window.App || {};
       }
     }
 
-    ctx.fillStyle = "#a8a29e";
+    ctx.fillStyle = `${SPECIMEN_PALETTE.ink}80`;
     ctx.font = font(20, "normal");
     ctx.textAlign = "center";
     const dateStr = new Date().toLocaleDateString(lang === "zh" ? "zh-HK" : "en-US", {
@@ -236,30 +238,40 @@ window.App = window.App || {};
         <button
           onClick={handleOpen}
           disabled={busy}
-          className="rounded-xl border-4 border-stone-200 bg-stone-50 text-stone-600 font-extrabold py-2 text-sm active:translate-y-[2px] transition-all disabled:opacity-50"
+          className="rounded-xl border font-extrabold py-2 text-sm active:translate-y-[2px] transition-all disabled:opacity-50"
+          style={{ borderColor: `${SPECIMEN_PALETTE.ink}33`, backgroundColor: `${SPECIMEN_PALETTE.ink}08`, color: SPECIMEN_PALETTE.ink }}
         >
           {busy ? t("share.generating") : t("profile.share")}
         </button>
 
-        <Modal open={!!previewUrl || !!error} onClose={handleClose} title={t("share.modalTitle", { name: beetle.name })}>
+        <SpecimenModal open={!!previewUrl || !!error} onClose={handleClose} title={t("share.modalTitle", { name: beetle.name })}>
           {error ? (
-            <p className="text-rose-500 font-bold text-sm">{error}</p>
+            <p className="font-bold text-sm" style={{ color: "#A6472E" }}>
+              {error}
+            </p>
           ) : (
             <>
-              {previewUrl && <img src={previewUrl} alt="" className="w-full rounded-2xl border-4 border-lime-100 mb-4" />}
+              {previewUrl && (
+                <img
+                  src={previewUrl}
+                  alt=""
+                  className="w-full rounded-2xl mb-4"
+                  style={{ border: `2px solid ${SPECIMEN_PALETTE.metallic}4D` }}
+                />
+              )}
               <div className="flex gap-3">
                 {canShareFiles && (
-                  <Button color="blue" className="flex-1" onClick={handleShare}>
+                  <SpecimenButton color="sky" className="flex-1" onClick={handleShare}>
                     {t("share.shareButton")}
-                  </Button>
+                  </SpecimenButton>
                 )}
-                <Button color="gold" className="flex-1" onClick={handleDownload}>
+                <SpecimenButton color="amber" className="flex-1" onClick={handleDownload}>
                   {t("share.downloadButton")}
-                </Button>
+                </SpecimenButton>
               </div>
             </>
           )}
-        </Modal>
+        </SpecimenModal>
       </>
     );
   }

@@ -5,8 +5,10 @@ window.App = window.App || {};
 (function () {
   const { useState } = React;
   const { Storage } = window.App;
-  const { Button, Modal } = window.App.UI;
+  const { SPECIMEN_PALETTE, SpecimenButton, SpecimenModal } = window.App.SpecimenTheme;
   const { useI18n } = window.App.I18n;
+
+  const ALERT_COLOR = "#A6472E";
 
   function BackupSettings({ onRestore }) {
     const { t } = useI18n();
@@ -66,45 +68,66 @@ window.App = window.App || {};
       <>
         <button
           onClick={handleOpen}
-          className="flex items-center justify-center w-10 h-10 rounded-xl border-4 border-stone-200 bg-white text-lg shrink-0"
+          className="flex items-center justify-center w-10 h-10 rounded-xl border text-lg shrink-0"
+          style={{ borderColor: `${SPECIMEN_PALETTE.ink}33`, backgroundColor: SPECIMEN_PALETTE.paper }}
         >
           ⚙️
         </button>
 
-        <Modal open={open} onClose={() => setOpen(false)} title={t("backup.title")}>
+        <SpecimenModal open={open} onClose={() => setOpen(false)} title={t("backup.title")}>
           {pending ? (
             <div className="flex flex-col gap-4">
-              <p className="text-sm font-extrabold text-rose-600">{t("backup.confirmTitle")}</p>
-              <p className="text-sm text-stone-600 font-bold">
+              <p className="text-sm font-extrabold" style={{ color: ALERT_COLOR }}>
+                {t("backup.confirmTitle")}
+              </p>
+              <p className="text-sm font-bold" style={{ color: `${SPECIMEN_PALETTE.ink}99` }}>
                 {t("backup.confirmMessage", { n: pending.beetles.length })}
               </p>
               <div className="flex gap-3">
-                <Button color="red" className="flex-1" onClick={confirmRestore}>
+                <SpecimenButton color="ink" className="flex-1" onClick={confirmRestore}>
                   {t("backup.confirmRestore")}
-                </Button>
-                <Button color="gold" className="flex-1" onClick={() => setPending(null)}>
+                </SpecimenButton>
+                <SpecimenButton color="amber" className="flex-1" onClick={() => setPending(null)}>
                   {t("form.cancel")}
-                </Button>
+                </SpecimenButton>
               </div>
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-              <p className="text-sm text-stone-600 font-bold">{t("backup.description")}</p>
+              <p className="text-sm font-bold" style={{ color: `${SPECIMEN_PALETTE.ink}99` }}>
+                {t("backup.description")}
+              </p>
 
-              <Button color="blue" onClick={handleExport}>
+              <SpecimenButton color="sky" onClick={handleExport}>
                 {t("backup.exportButton")}
-              </Button>
+              </SpecimenButton>
 
-              <label className="cursor-pointer text-center rounded-2xl border-4 border-amber-600 bg-amber-400 text-amber-950 font-extrabold px-5 py-3 text-lg active:translate-y-[2px] transition-all">
+              <label
+                className="cursor-pointer text-center rounded-2xl border font-extrabold px-5 py-3 text-lg active:translate-y-[2px] transition-all"
+                style={{
+                  backgroundColor: SPECIMEN_PALETTE.amber,
+                  borderColor: SPECIMEN_PALETTE.amber,
+                  color: SPECIMEN_PALETTE.ink,
+                  boxShadow: "0 2px 0 #7c561d, 0 5px 8px rgba(59,46,34,0.25), 0 10px 18px rgba(59,46,34,0.15)",
+                }}
+              >
                 {t("backup.importButton")}
                 <input type="file" accept="application/json" onChange={handleFileSelect} className="hidden" />
               </label>
 
-              {error && <p className="text-xs font-bold text-rose-500">{error}</p>}
-              {success && <p className="text-xs font-bold text-emerald-600">{t("backup.success")}</p>}
+              {error && (
+                <p className="text-xs font-bold" style={{ color: ALERT_COLOR }}>
+                  {error}
+                </p>
+              )}
+              {success && (
+                <p className="text-xs font-bold" style={{ color: SPECIMEN_PALETTE.metallic }}>
+                  {t("backup.success")}
+                </p>
+              )}
             </div>
           )}
-        </Modal>
+        </SpecimenModal>
       </>
     );
   }

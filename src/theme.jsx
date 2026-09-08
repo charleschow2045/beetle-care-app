@@ -1,4 +1,8 @@
-// Shared UI primitives — light, Planta-inspired theme with bold playful accents
+// LEGACY theme — the original light Planta-inspired look. Superseded by the
+// "Specimen Record Card" system in specimenTheme.jsx as of the 2026-09-08
+// full rollout. Kept here for reference/rollback only — no screen in this
+// app imports Card/Button/Modal/Avatar/COLORS from here anymore. Safe to
+// delete once the new system has been stable for a while.
 window.App = window.App || {};
 
 (function () {

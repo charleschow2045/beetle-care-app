@@ -286,3 +286,37 @@ playful icons, chunky rounded buttons, badge/achievement graphics.
 
 All 9 original features are now built, plus the Explore/Quiz/bilingual
 additions above.
+
+## Visual design system — "Specimen Record Card" (full rollout complete)
+- The app's official theme is `src/specimenTheme.jsx` (`SPECIMEN_PALETTE`,
+  `SpecimenCard`, `SpecimenButton`, `SpecimenModal`, `SpecimenAvatar`),
+  loaded right after `theme.jsx` in `index.html` so every other screen
+  script can use it. Approved in two rounds: first a 3-screen preview
+  (`Root.jsx`'s shell + `ReminderDashboard`, `BeetleProfileCard`,
+  `TempHumidityLog`), then a full rollout to the remaining 10 screens
+  (`BackupSettings`, `BeetleQuiz`, `BeetleSetupForm`, `BeetleSwitcher`,
+  `DiaryLog`, `Explore`, `GrowthLog`, `PhotoPicker`, `ShareExport`,
+  `TodayOverview`) plus `Root.jsx`'s two remaining `Card` usages that were
+  missed in the first pass. Every screen in the app now uses it — no
+  module imports from `window.App.UI` (the old theme) anymore.
+- `src/theme.jsx` (`COLORS`/`Button`/`Card`/`Modal`/`Avatar` under
+  `window.App.UI`) is kept **for reference/rollback only**. Its header
+  comment says so explicitly. Safe to delete once the new system has been
+  stable for a while.
+- Per-feature primary accent colors chosen from `SPECIMEN_PALETTE`: diary
+  → moss, growth/molt → amber, temp/humidity → sky, explore community
+  links → moss, explore shop map link-out → sky, quiz correct/wrong →
+  moss / a one-off rust-terracotta `#A6472E` alert color (also reused for
+  overdue reminders and error/delete text app-wide).
+  `ShareExport.jsx`'s `generateShareImage()` canvas output (the
+  downloadable/shareable PNG) was also recolored to `SPECIMEN_PALETTE`
+  hex values, so the exported card visually matches the in-app theme
+  rather than staying on the old yellow/lime palette.
+- `SpecimenCard` accepts an optional `style` prop (merged after the
+  default look) so a caller can tint an individual card, e.g.
+  `GrowthLog.jsx`'s stage-tip callout.
+- `BeetleQuiz.jsx`'s 20-question pool and per-attempt shuffle/pick-10
+  randomization (`QUESTIONS`, `shuffle`, `pickQuestions`, `QUIZ_LENGTH`)
+  were deliberately left untouched during this visual migration — only
+  the JSX/styling changed, verified by re-reading the question-selection
+  logic after the edit.

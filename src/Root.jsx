@@ -17,8 +17,7 @@ window.App = window.App || {};
     BackupSettings,
     TodayOverview,
   } = window.App;
-  const { Card } = window.App.UI;
-  const { SPECIMEN_PALETTE } = window.App.SpecimenTheme;
+  const { SPECIMEN_PALETTE, SpecimenCard } = window.App.SpecimenTheme;
   const { useI18n } = window.App.I18n;
 
   const TAB_KEYS = ["missions", "diary", "growth", "climate", "explore", "quiz"];
@@ -212,9 +211,9 @@ window.App = window.App || {};
           <p className="font-bold mb-6" style={{ color: `${SPECIMEN_PALETTE.ink}99` }}>
             {t("app.emptyStateSubtitle")}
           </p>
-          <Card>
+          <SpecimenCard>
             <BeetleSetupForm onSave={addBeetle} showCancel={false} />
-          </Card>
+          </SpecimenCard>
         </div>
       );
     }
@@ -242,14 +241,14 @@ window.App = window.App || {};
 
         <main className="px-4 mt-5">
           {editingProfile ? (
-            <Card>
+            <SpecimenCard>
               <BeetleSetupForm
                 initialBeetle={activeBeetle}
                 submitLabel={t("form.saveChanges")}
                 onSave={saveProfileEdits}
                 onCancel={() => setEditingProfile(false)}
               />
-            </Card>
+            </SpecimenCard>
           ) : (
             <>
               <BeetleProfileCard beetle={activeBeetle} onEdit={() => setEditingProfile(true)} />

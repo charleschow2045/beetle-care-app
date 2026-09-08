@@ -5,31 +5,46 @@ window.App = window.App || {};
 
 (function () {
   const { Storage } = window.App;
-  const { Card } = window.App.UI;
+  const { SPECIMEN_PALETTE, SpecimenCard } = window.App.SpecimenTheme;
   const { useI18n } = window.App.I18n;
+
+  // Same rust/terracotta alert accent used for "overdue" in ReminderDashboard.jsx.
+  const OVERDUE_COLOR = "#A6472E";
 
   function BeetleAttentionRow({ beetle, dueTypes, onSelect }) {
     const { t } = useI18n();
     return (
       <button
         onClick={onSelect}
-        className="w-full flex items-center gap-3 bg-white border-4 border-lime-200 rounded-2xl px-3 py-2.5 text-left active:translate-y-[2px] transition-all"
+        className="w-full flex items-center gap-3 rounded-2xl px-3 py-2.5 text-left border transition-all active:translate-y-[2px]"
+        style={{
+          backgroundColor: SPECIMEN_PALETTE.paper,
+          borderColor: `${SPECIMEN_PALETTE.metallic}33`,
+          boxShadow: "0 1px 2px rgba(59,46,34,0.08), 0 3px 6px rgba(59,46,34,0.08)",
+        }}
       >
-        <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-stone-200 bg-stone-100 flex items-center justify-center shrink-0">
+        <div
+          className="w-10 h-10 rounded-xl overflow-hidden border flex items-center justify-center shrink-0"
+          style={{ borderColor: `${SPECIMEN_PALETTE.ink}26`, backgroundColor: `${SPECIMEN_PALETTE.ink}0A` }}
+        >
           {beetle.photoDataUrl ? (
             <img src={beetle.photoDataUrl} alt="" className="w-full h-full object-cover" />
           ) : (
             <span className="text-lg">🪲</span>
           )}
         </div>
-        <span className="font-extrabold text-stone-800 text-sm shrink-0">{beetle.name}</span>
+        <span className="font-extrabold text-sm shrink-0" style={{ color: SPECIMEN_PALETTE.ink }}>
+          {beetle.name}
+        </span>
         <div className="flex gap-1.5 ml-auto flex-wrap justify-end">
           {dueTypes.map(({ type, overdue }) => (
             <span
               key={type.key}
-              className={`text-xs px-2 py-1 rounded-full font-extrabold ${
-                overdue ? "bg-rose-500 text-white" : "bg-amber-400 text-amber-950"
-              }`}
+              className="text-xs px-2 py-1 rounded-full font-extrabold"
+              style={{
+                backgroundColor: overdue ? OVERDUE_COLOR : SPECIMEN_PALETTE.amber,
+                color: overdue ? SPECIMEN_PALETTE.paper : SPECIMEN_PALETTE.ink,
+              }}
             >
               {type.emoji} {overdue ? "!" : t("dashboard.dueToday")}
             </span>
@@ -54,10 +69,14 @@ window.App = window.App || {};
       .filter((r) => r.dueTypes.length > 0);
 
     return (
-      <Card className="mb-5">
-        <h2 className="text-sm font-extrabold text-stone-800 mb-3">{t("today.heading")}</h2>
+      <SpecimenCard className="mb-5">
+        <h2 className="text-sm font-extrabold mb-3" style={{ color: SPECIMEN_PALETTE.ink }}>
+          {t("today.heading")}
+        </h2>
         {rows.length === 0 ? (
-          <p className="text-sm font-bold text-emerald-600">{t("today.allGood")}</p>
+          <p className="text-sm font-bold" style={{ color: SPECIMEN_PALETTE.metallic }}>
+            {t("today.allGood")}
+          </p>
         ) : (
           <div className="flex flex-col gap-2">
             {rows.map(({ beetle, dueTypes }) => (
@@ -65,7 +84,7 @@ window.App = window.App || {};
             ))}
           </div>
         )}
-      </Card>
+      </SpecimenCard>
     );
   }
 

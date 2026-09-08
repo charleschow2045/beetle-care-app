@@ -1,11 +1,11 @@
-// "Specimen Record Card" visual theme — a preview alternative to theme.jsx's
-// current look, scoped to exactly 3 screens for review before wider rollout:
-// Root.jsx's shell + ReminderDashboard (the Dashboard), BeetleProfileCard
-// (the badge/achievement display), and TempHumidityLog. Deliberately kept in
-// its own file rather than editing theme.jsx directly — every other screen
-// keeps using the existing Card/Button/COLORS untouched until this is
-// approved, and this file can be deleted with zero effect on anything else
-// if it isn't.
+// "Specimen Record Card" visual theme — OFFICIAL design system as of the
+// 2026-09-08 full rollout (approved after a 3-screen preview: Root.jsx's
+// shell + ReminderDashboard, BeetleProfileCard, TempHumidityLog). Every
+// screen in the app now uses SpecimenCard/SpecimenButton/SpecimenModal/
+// SpecimenAvatar from here. Kept in its own file rather than folded into
+// theme.jsx, per the rollout instructions — theme.jsx's original
+// Card/Button/COLORS/Modal/Avatar are kept there for reference/rollback
+// only and are no longer imported by any screen.
 window.App = window.App || {};
 
 (function () {
@@ -32,7 +32,9 @@ window.App = window.App || {};
   // `corner` adds a small pin/sticker-like circle in the top-right corner —
   // meant for a flagship card (the beetle's own profile), not every small
   // repeated card, per the "not mandatory, use where it fits" brief.
-  function SpecimenCard({ children, className = "", corner = false }) {
+  // `style` lets a caller override/extend the default look (e.g. a tinted
+  // background for a callout card) without duplicating the card chrome.
+  function SpecimenCard({ children, className = "", corner = false, style = {} }) {
     return (
       <div
         className={`relative rounded-[1.25rem] p-4 border ${className}`}
@@ -40,6 +42,7 @@ window.App = window.App || {};
           backgroundColor: SPECIMEN_PALETTE.paper,
           borderColor: `${SPECIMEN_PALETTE.metallic}4D`,
           boxShadow: "0 1px 2px rgba(59,46,34,0.10), 0 4px 8px rgba(59,46,34,0.10), 0 12px 24px rgba(59,46,34,0.08)",
+          ...style,
         }}
       >
         {corner && (
@@ -75,5 +78,57 @@ window.App = window.App || {};
     );
   }
 
-  window.App.SpecimenTheme = { SPECIMEN_PALETTE, SPECIMEN_BUTTON_COLORS, SpecimenCard, SpecimenButton };
+  function SpecimenModal({ open, onClose, children, title }) {
+    if (!open) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+        <div
+          className="rounded-[1.25rem] p-6 w-full max-w-sm border"
+          style={{
+            backgroundColor: SPECIMEN_PALETTE.paper,
+            borderColor: `${SPECIMEN_PALETTE.metallic}4D`,
+            boxShadow: "0 2px 4px rgba(59,46,34,0.12), 0 8px 16px rgba(59,46,34,0.12), 0 20px 32px rgba(59,46,34,0.10)",
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {title && (
+            <h2 className="text-2xl font-extrabold mb-4" style={{ color: SPECIMEN_PALETTE.ink }}>
+              {title}
+            </h2>
+          )}
+          {children}
+        </div>
+      </div>
+    );
+  }
+
+  function SpecimenAvatar({ active, onClick, photoUrl }) {
+    return (
+      <button
+        onClick={onClick}
+        className="shrink-0 flex items-center justify-center w-16 h-16 rounded-2xl border font-extrabold text-3xl overflow-hidden transition-all duration-100"
+        style={
+          active
+            ? {
+                borderColor: SPECIMEN_PALETTE.metallic,
+                backgroundColor: `${SPECIMEN_PALETTE.metallic}1F`,
+                boxShadow: "0 3px 0 #2c4a3c",
+                transform: "translateY(-2px)",
+              }
+            : { borderColor: `${SPECIMEN_PALETTE.ink}33`, backgroundColor: `${SPECIMEN_PALETTE.ink}0A`, color: `${SPECIMEN_PALETTE.ink}80` }
+        }
+      >
+        {photoUrl ? <img src={photoUrl} alt="" className="w-full h-full object-cover" /> : "🪲"}
+      </button>
+    );
+  }
+
+  window.App.SpecimenTheme = {
+    SPECIMEN_PALETTE,
+    SPECIMEN_BUTTON_COLORS,
+    SpecimenCard,
+    SpecimenButton,
+    SpecimenModal,
+    SpecimenAvatar,
+  };
 })();
